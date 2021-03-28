@@ -12,6 +12,9 @@ def get_portfolio_performance(
 ) -> pd.DataFrame:
     """
     Gives CAPM performance measures for the constituents as well as the portfolio overall
+
+    Numbers are calculated weekly but reported annually.
+
     :param values: valuations of the individual investments: (date)|<name>...
     :param exposure: total value by investment (date)|<name>... with the same name and same index as values
     :param market: name of the market instrument
@@ -25,6 +28,6 @@ def get_portfolio_performance(
     returns = np.log10(weekly_values).diff()
     covariances = returns.cov()
     betas = covariances[market] / covariances[market][market]
-    avg_returns = returns.mean()
-    sd = np.diagonal(covariances)
+    avg_returns = returns.mean() * 250/5
+    sd = np.diagonal(covariances) * np.sqrt(250 / 5)
     return pd.DataFrame({"return": avg_returns, "sd": sd, "betas": betas})
