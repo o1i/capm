@@ -32,16 +32,17 @@ def get_portfolio_performance(
     days = pd.bdate_range(min(values.index), max(values.index), freq="C", weekmask="Fri")
     days = days[days >= max(days) - max_dur]
     weekly_values = values.loc[days]
-    returns = np.log10(weekly_values).diff()
+    returns = np.exp(np.log(weekly_values).diff()) - 1
     weekly_exp = exposure.loc[days]
     returns.loc[returns.index[1:], "portfolio"] = np.nansum(weekly_exp.iloc[:-1, :].values /  # exposure
                                                             np.tile(np.nansum(weekly_exp.iloc[:-1, :].values,
                                                                               axis=1).reshape([-1, 1]),
                                                                     [1, weekly_exp.shape[1]]) *  # normalisation
                                                             returns.iloc[1:, :].values, axis=1)  # returns
-    covariances = returns.cov()
+
+    covariances = returns.cov() * 250 / 5
     betas = covariances[market] / covariances[market][market]
-    avg_returns = returns.apply(lambda x: 10 ** (np.nanmean(x) * 250/5) - 1)
-    sd = np.diagonal(covariances) * np.sqrt(250 / 5)
+    avg_returns = returns.mean() * 250 / 5
+    sd = np.diagonal(covariances)
     last_weights = exposure.dropna().iloc[-1, :]
     return pd.DataFrame({"return": avg_returns, "sd": sd, "beta": betas}), covariances, last_weights

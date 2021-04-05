@@ -10,7 +10,7 @@ def get_historic_values() -> pd.DataFrame:
     """
     Get a dataframe of historic valuations (in their respective currencies) stored in data
 
-    Source of the data is UBS quotes. Where available (ETFs), closing prices are used, closing otherwise
+    Source of the data is UBS quotes. Where available (ETFs), total return prices are used, closing otherwise
 
     Assumes the files to be named data/_val_<isin>_[...].csv.
 
